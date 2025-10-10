@@ -1,0 +1,56 @@
+{% extends "loan/base.html" %}
+{% block title %}Мои заявки{% endblock %}
+
+{% block content %}
+<h2>Мои заявки</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Дата</th>
+      <th>Доход</th>
+      <th>Супп. доход</th>
+      <th>Сумма</th>
+      <th>Срок</th>
+      <th>История</th>
+      <th>Зона</th>
+      <th>Предсказание</th>
+      <th>Вероятность</th>
+    </tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  async function loadMy() {
+    try {
+      const resp = await fetch("/api/loans/?ordering=-created_at", {credentials: "same-origin"});
+      const data = await resp.json();
+      const rows = document.getElementById('rows');
+      rows.innerHTML = "";
+
+      const items = data.results || data; // если пагинация включена
+      items.forEach(it => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${new Date(it.created_at).toLocaleString()}</td>
+          <td>${it.applicant_income}</td>
+          <td>${it.coapplicant_income}</td>
+          <td>${it.loan_amount}</td>
+          <td>${it.loan_amount_term}</td>
+          <td>${it.credit_history}</td>
+          <td>${it.property_area}</td>
+          <td>${it.predicted_approved ? 'Одобрено' : 'Нет'}</td>
+          <td>${(Number(it.predicted_probability) || 0).toFixed(2)}</td>
+        `;
+        rows.appendChild(tr);
+      });
+    } catch (e) {
+      const rows = document.getElementById('rows');
+      rows.innerHTML = `<tr><td colspan="9" style="color:crimson;">Ошибка загрузки: ${e.message}</td></tr>`;
+    }
+  }
+  loadMy();
+</script>
+{% endblock %}

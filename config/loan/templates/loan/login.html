@@ -1,0 +1,16 @@
+{% extends "loan/base.html" %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<h2>Вход</h2>
+<form method="post" action="{% url 'login' %}">
+  {% csrf_token %}
+  <label>Имя пользователя
+    <input type="text" name="username" required>
+  </label>
+  <label>Пароль
+    <input type="password" name="password" required>
+  </label>
+  <button type="submit">Войти</button>
+</form>
+<p>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь</a></p>
+{% endblock %}

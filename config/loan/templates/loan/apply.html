@@ -1,0 +1,152 @@
+{% extends "loan/base.html" %}
+{% block title %}Подать заявку{% endblock %}
+
+{% block content %}
+<h2>Кредитная заявка</h2>
+
+<form id="loan-form" onsubmit="return false;">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+    <label>Gender
+      <select name="gender" required>
+        <option value="">--выбрать--</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+    </label>
+
+    <label>Married
+      <select name="married" required>
+        <option value="">--выбрать--</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </label>
+
+    <label>Dependents
+      <select name="dependents" required>
+        <option value="">--выбрать--</option>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3+">3+</option>
+      </select>
+    </label>
+
+    <label>Education
+      <select name="education" required>
+        <option value="">--выбрать--</option>
+        <option value="Graduate">Graduate</option>
+        <option value="Not Graduate">Not Graduate</option>
+      </select>
+    </label>
+
+    <label>Self Employed
+      <select name="self_employed" required>
+        <option value="">--выбрать--</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </label>
+
+    <label>Applicant Income
+      <input type="number" name="applicant_income" min="0" step="1" required placeholder="напр. 4000">
+    </label>
+
+    <label>Coapplicant Income
+      <input type="number" name="coapplicant_income" min="0" step="1" required placeholder="напр. 1000">
+    </label>
+
+    <label>Loan Amount
+      <input type="number" name="loan_amount" min="0" step="0.01" required placeholder="напр. 150">
+    </label>
+
+    <label>Loan Amount Term (месяцы)
+      <input type="number" name="loan_amount_term" min="1" step="1" required placeholder="напр. 360">
+    </label>
+
+    <label>Credit History (0.0 / 1.0)
+      <input type="number" name="credit_history" min="0" max="1" step="0.1" required placeholder="1.0">
+    </label>
+
+    <label>Property Area
+      <select name="property_area" required>
+        <option value="">--выбрать--</option>
+        <option value="Urban">Urban</option>
+        <option value="Rural">Rural</option>
+        <option value="Semiurban">Semiurban</option>
+      </select>
+    </label>
+  </div>
+
+  <button id="submit-btn" style="margin-top:12px;">Отправить</button>
+</form>
+
+<section id="result" style="margin-top:18px;display:none;">
+  <h3>Результат</h3>
+  <p id="result-text"></p>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // получить CSRF из cookie
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+  }
+  const csrftoken = getCookie('csrftoken');
+
+  const form = document.getElementById('loan-form');
+  const resultBox = document.getElementById('result');
+  const resultText = document.getElementById('result-text');
+  const submitBtn = document.getElementById('submit-btn');
+
+  submitBtn.addEventListener('click', async () => {
+    // собрать данные формы -> JSON
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    // числа привести к типам
+    data.applicant_income = Number(data.applicant_income);
+    data.coapplicant_income = Number(data.coapplicant_income);
+    data.loan_amount_term = Number(data.loan_amount_term);
+    data.loan_amount = Number(String(data.loan_amount).replace(',', '.'));
+    data.credit_history = Number(String(data.credit_history).replace(',', '.'));
+
+    try {
+      const resp = await fetch("/api/loans/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrftoken
+        },
+        body: JSON.stringify(data),
+        credentials: "same-origin"
+      });
+
+      const payload = await resp.json();
+      if (!resp.ok) {
+        resultBox.style.display = 'block';
+        resultText.textContent = "Ошибка: " + (payload.detail || JSON.stringify(payload));
+        resultText.style.color = "crimson";
+        return;
+      }
+
+      // ожидаем, что сериалайзер возвращает predicted_approved / predicted_probability
+      const approved = payload.predicted_approved;
+      const proba = payload.predicted_probability;
+
+      resultBox.style.display = 'block';
+      resultText.style.color = approved ? "green" : "crimson";
+      resultText.textContent = approved
+        ? `Одобрено ✅ (p = ${Number(proba).toFixed(2)})`
+        : `Не одобрено ❌ (p = ${Number(proba).toFixed(2)})`;
+      form.reset();
+    } catch (e) {
+      resultBox.style.display = 'block';
+      resultText.style.color = "crimson";
+      resultText.textContent = "Сетевая ошибка: " + e.message;
+    }
+  });
+</script>
+{% endblock %}
