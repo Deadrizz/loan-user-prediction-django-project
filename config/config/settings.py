@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4xzb46mjd**8=qxt&$zzszy_1dh4q5xn&l*-7*gixjroha5vpe'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
+#подключаем нашу базу данных
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -129,6 +129,7 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+#настройки для нашего апи
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
@@ -144,6 +145,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'PAGE_SIZE': 10,
 }
+# настройки для shema docs и redoc
 SPECTACULAR_SETTINGS = {
     "TITLE": "Loan API",
     "VERSION": "1.0.0",
@@ -154,5 +156,6 @@ SPECTACULAR_SETTINGS = {
     },
     "SECURITY": [{"bearerAuth": []}],
 }
+#страница по дэфолту для залогиненого пользователя
 LOGIN_REDIRECT_URL = "/loan/apply/"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

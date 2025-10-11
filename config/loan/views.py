@@ -20,6 +20,7 @@ from django.contrib.auth import login as auth_login
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+#подключаемся к ML
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'model.pkl')
 model = joblib.load(MODEL_PATH)
 # @csrf_exempt
@@ -33,6 +34,7 @@ model = joblib.load(MODEL_PATH)
 #             return JsonResponse({'prediction': prediction, 'probability': probability})
 #         return JsonResponse({'error': 'Request body not found.'})
 #     return JsonResponse({'error': 'Method not allowed'})
+#класс для нашего сериалайзера
 class LoanApplicationListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = LoanApplicationSerializer
@@ -40,8 +42,10 @@ class LoanApplicationListCreateView(generics.ListCreateAPIView):
     filterset_fields = ['created_at']
     ordering_fields = ['applicant_income','created_at']
     search_fields = ['user__username']
+    #получаем queryset и фильтруем его по определённому юзеру что бы он видел только свою базу данных
     def get_queryset(self):
         return LoanApplication.objects.filter(user=self.request.user).order_by('-created_at')
+    #подключаем модель к нашему джанго проекту
     def perform_create(self,serializer):
         validated_data = serializer.validated_data
         renamed_data = {
@@ -61,12 +65,15 @@ class LoanApplicationListCreateView(generics.ListCreateAPIView):
         prediction = model.predict(df)
         probability = model.predict_proba(df)[:, 1]
         serializer.save(user=self.request.user,predicted_approved=bool(prediction[0]),predicted_probability=float(probability[0]))
+#рендерим нашу страницу предварительно оборачивая её только в залогиненых пользователей
 @login_required
 def apply_loan_application(request):
     return render(request, 'loan/apply.html')
+#рендерим нашу страницу предварительно оборачивая её только в залогиненых пользователей
 @login_required
 def my_list(request):
     return render(request, 'loan/my_list.html')
+#регистрируем нашего пользователя
 def register_view(request):
     if request.method=='POST':
         form = UserRegisterForm(request.POST)

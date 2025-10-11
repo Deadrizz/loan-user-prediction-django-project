@@ -19,6 +19,7 @@ from django.urls import path,include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from django.contrib.auth.views import LoginView, LogoutView
 from loan.views import register_view
+#создаём наши урлы
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),

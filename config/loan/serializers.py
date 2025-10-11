@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import LoanApplication
+#создаём сериализаторы для нашего апи в дальнейшем для фронта
 class LoanApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model=LoanApplication
