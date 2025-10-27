@@ -1,95 +1,96 @@
 {% extends "loan/base.html" %}
-{% block title %}Подать заявку{% endblock %}
+{% block title %}Подати заявку{% endblock %}
 
 {% block content %}
-<h2>Кредитная заявка</h2>
+<h2>📋 Форма кредитної заявки</h2>
+<p>Заповніть усі поля нижче, щоб отримати прогноз схвалення кредиту.</p>
 
-<form id="loan-form" onsubmit="return false;">
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
-    <label>Gender
+<form id="loan-form" onsubmit="return false;" style="margin-top:15px;">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;">
+
+    <label>Стать
       <select name="gender" required>
-        <option value="">--выбрать--</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
+        <option value="">-- Оберіть стать --</option>
+        <option value="Male">Чоловіча</option>
+        <option value="Female">Жіноча</option>
       </select>
     </label>
 
-    <label>Married
+    <label>Сімейний стан
       <select name="married" required>
-        <option value="">--выбрать--</option>
-        <option value="Yes">Yes</option>
-        <option value="No">No</option>
+        <option value="">-- Оберіть --</option>
+        <option value="Yes">Одружений / Заміжня</option>
+        <option value="No">Неодружений / Незаміжня</option>
       </select>
     </label>
 
-    <label>Dependents
+    <label>Кількість утриманців
       <select name="dependents" required>
-        <option value="">--выбрать--</option>
-        <option value="0">0</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3+">3+</option>
+        <option value="">-- Оберіть --</option>
+        <option value="0">0 — немає</option>
+        <option value="1">1 утриманець</option>
+        <option value="2">2 утриманці</option>
+        <option value="3+">3 або більше</option>
       </select>
     </label>
 
-    <label>Education
+    <label>Освіта
       <select name="education" required>
-        <option value="">--выбрать--</option>
-        <option value="Graduate">Graduate</option>
-        <option value="Not Graduate">Not Graduate</option>
+        <option value="">-- Оберіть рівень освіти --</option>
+        <option value="Graduate">Вища</option>
+        <option value="Not Graduate">Середня</option>
       </select>
     </label>
 
-    <label>Self Employed
+    <label>Самозайнятість
       <select name="self_employed" required>
-        <option value="">--выбрать--</option>
-        <option value="Yes">Yes</option>
-        <option value="No">No</option>
+        <option value="">-- Оберіть --</option>
+        <option value="Yes">Так</option>
+        <option value="No">Ні</option>
       </select>
     </label>
 
-    <label>Applicant Income
-      <input type="number" name="applicant_income" min="0" step="1" required placeholder="напр. 4000">
+    <label>Основний дохід (₴)
+      <input type="number" name="applicant_income" min="0" required placeholder="Напр. 40000">
+      <small>Вкажіть свій щомісячний дохід.</small>
     </label>
 
-    <label>Coapplicant Income
-      <input type="number" name="coapplicant_income" min="0" step="1" required placeholder="напр. 1000">
+    <label>Дохід співзаявника (₴)
+      <input type="number" name="coapplicant_income" min="0" placeholder="Напр. 15000">
+      <small>Якщо подаєте заявку разом із партнером — вкажіть його дохід. Інакше залиште порожнім.</small>
     </label>
 
-    <label>Loan Amount
-      <input type="number" name="loan_amount" min="0" step="0.01" required placeholder="напр. 150">
+    <label>Сума кредиту (тис. ₴)
+      <input type="number" name="loan_amount" min="0" step="0.01" required placeholder="Напр. 250.5">
+      <small>Скільки грошей ви хочете позичити.</small>
     </label>
 
-    <label>Loan Amount Term (месяцы)
-      <input type="number" name="loan_amount_term" min="1" step="1" required placeholder="напр. 360">
+    <label>Термін кредиту (в місяцях)
+      <input type="number" name="loan_amount_term" min="1" required placeholder="Напр. 360">
+      <small>На який термін ви хочете взяти кредит (наприклад, 360 місяців = 30 років).</small>
     </label>
 
-    <label>Credit History (0.0 / 1.0)
-      <input type="number" name="credit_history" min="0" max="1" step="0.1" required placeholder="1.0">
-    </label>
-
-    <label>Property Area
+    <label>Тип місцевості
       <select name="property_area" required>
-        <option value="">--выбрать--</option>
-        <option value="Urban">Urban</option>
-        <option value="Rural">Rural</option>
-        <option value="Semiurban">Semiurban</option>
+        <option value="">-- Оберіть --</option>
+        <option value="Urban">Міська</option>
+        <option value="Rural">Сільська</option>
+        <option value="Semiurban">Передмістя</option>
       </select>
     </label>
   </div>
 
-  <button id="submit-btn" style="margin-top:12px;">Отправить</button>
+  <button id="submit-btn" style="margin-top:18px;">Надіслати заявку</button>
 </form>
 
-<section id="result" style="margin-top:18px;display:none;">
-  <h3>Результат</h3>
+<section id="result" style="margin-top:20px;display:none;">
+  <h3>Результат прогнозу</h3>
   <p id="result-text"></p>
 </section>
 {% endblock %}
 
 {% block scripts %}
 <script>
-  // получить CSRF из cookie
   function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -103,15 +104,11 @@
   const submitBtn = document.getElementById('submit-btn');
 
   submitBtn.addEventListener('click', async () => {
-    // собрать данные формы -> JSON
     const data = Object.fromEntries(new FormData(form).entries());
-
-    // числа привести к типам
     data.applicant_income = Number(data.applicant_income);
-    data.coapplicant_income = Number(data.coapplicant_income);
+    data.coapplicant_income = data.coapplicant_income ? Number(data.coapplicant_income) : 0;
+    data.loan_amount = Number(data.loan_amount);
     data.loan_amount_term = Number(data.loan_amount_term);
-    data.loan_amount = Number(String(data.loan_amount).replace(',', '.'));
-    data.credit_history = Number(String(data.credit_history).replace(',', '.'));
 
     try {
       const resp = await fetch("/api/loans/", {
@@ -125,27 +122,27 @@
       });
 
       const payload = await resp.json();
+      resultBox.style.display = 'block';
+
       if (!resp.ok) {
-        resultBox.style.display = 'block';
-        resultText.textContent = "Ошибка: " + (payload.detail || JSON.stringify(payload));
+        resultText.textContent = "Помилка: " + (payload.detail || JSON.stringify(payload));
         resultText.style.color = "crimson";
         return;
       }
 
-      // ожидаем, что сериалайзер возвращает predicted_approved / predicted_probability
       const approved = payload.predicted_approved;
       const proba = payload.predicted_probability;
 
-      resultBox.style.display = 'block';
       resultText.style.color = approved ? "green" : "crimson";
       resultText.textContent = approved
-        ? `Одобрено ✅ (p = ${Number(proba).toFixed(2)})`
-        : `Не одобрено ❌ (p = ${Number(proba).toFixed(2)})`;
+        ? `✅ Вітаємо! Ймовірність схвалення: ${(proba * 100).toFixed(1)}%.`
+        : `❌ На жаль, заявка, ймовірно, буде відхилена (${(proba * 100).toFixed(1)}%).`;
+
       form.reset();
     } catch (e) {
       resultBox.style.display = 'block';
       resultText.style.color = "crimson";
-      resultText.textContent = "Сетевая ошибка: " + e.message;
+      resultText.textContent = "Сетева помилка: " + e.message;
     }
   });
 </script>

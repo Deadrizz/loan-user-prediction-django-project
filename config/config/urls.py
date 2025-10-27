@@ -19,16 +19,18 @@ from django.urls import path,include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from django.contrib.auth.views import LoginView, LogoutView
 from loan.views import register_view
+from django.views.generic import TemplateView
 #создаём наши урлы
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
+    path('', TemplateView.as_view(template_name='loan/main.html'), name='main'),
+    # path('api-auth/', include('rest_framework.urls')),
     path('api/loans/', include('loan.urls')),
     path('loan/',include('loan.pages_url')),
     path('login/', LoginView.as_view(template_name='loan/login.html'), name='login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('register/', register_view, name='register'),
-    path("accounts/", include("django.contrib.auth.urls")),
+    # path("accounts/", include("django.contrib.auth.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),

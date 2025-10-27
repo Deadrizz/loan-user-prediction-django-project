@@ -1,0 +1,33 @@
+{% extends "loan/base.html" %}
+{% block title %}Головна сторінка{% endblock %}
+
+{% block content %}
+<section style="text-align:center; margin-top:40px;">
+  <h1>💰 Онлайн перевірка шансу на отримання кредиту</h1>
+  <p style="max-width:600px; margin: 20px auto;">
+    Це веб-застосунок на Django, який використовує модель машинного навчання
+    для оцінки ймовірності схвалення кредиту. Заповніть форму, і система
+    покаже — чи може заявка бути схвалена.
+  </p>
+
+  {% if user.is_authenticated %}
+    <a href="{% url 'loan-apply' %}" class="btn"
+       style="background-color:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;">
+       Подати заявку
+    </a>
+    <a href="{% url 'logout' %}" class="btn" 
+       style="background-color:#f44336;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;">
+       Вийти
+    </a>
+  {% else %}
+    <a href="{% url 'login' %}" class="btn" 
+       style="background-color:#2196F3;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;">
+       Увійти
+    </a>
+    <a href="{% url 'register' %}" class="btn" 
+       style="background-color:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;">
+       Зареєструватися
+    </a>
+  {% endif %}
+</section>
+{% endblock %}

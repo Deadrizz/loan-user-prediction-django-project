@@ -36,18 +36,18 @@ model = joblib.load(MODEL_PATH)
 #     return JsonResponse({'error': 'Method not allowed'})
 #класс для нашего сериалайзера
 class LoanApplicationListCreateView(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = LoanApplicationSerializer
-    filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
-    filterset_fields = ['created_at']
-    ordering_fields = ['applicant_income','created_at']
-    search_fields = ['user__username']
+    permission_classes = [IsAuthenticated] #ставимо пермишн клас на авторизований
+    serializer_class = LoanApplicationSerializer # підключаемось до нашого сериализатора
+    filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter] # додаємо в апи функції пошуку.фільтраціі та упорядкування
+    filterset_fields = ['created_at'] #фільтруємо наші поля по часу створення
+    ordering_fields = ['applicant_income','created_at'] #упорядковуємо по доходу та часу створення заявки
+    search_fields = ['user__username'] #робимо пошук по імені
     #получаем queryset и фильтруем его по определённому юзеру что бы он видел только свою базу данных
     def get_queryset(self):
         return LoanApplication.objects.filter(user=self.request.user).order_by('-created_at')
     #подключаем модель к нашему джанго проекту
     def perform_create(self,serializer):
-        validated_data = serializer.validated_data
+        validated_data = serializer.validated_data # валідируємо дані користувачо сгідно нашим валідаторам
         renamed_data = {
             "Gender": validated_data["gender"],
             "Married": validated_data["married"],
@@ -58,13 +58,12 @@ class LoanApplicationListCreateView(generics.ListCreateAPIView):
             "CoapplicantIncome": int(validated_data["coapplicant_income"]),
             "LoanAmount": float(validated_data["loan_amount"]),
             "Loan_Amount_Term": int(validated_data["loan_amount_term"]),
-            "Credit_History": float(validated_data["credit_history"] or 0.0),
             "Property_Area": validated_data["property_area"]
-        }
-        df = pd.DataFrame([renamed_data])
+        } # робимо маппинг щоб мл модель зрозуміла які дані користувача куди підходять
+        df = pd.DataFrame([renamed_data]) # створюємо дата фрейм з наших маппенених даних
         prediction = model.predict(df)
-        probability = model.predict_proba(df)[:, 1]
-        serializer.save(user=self.request.user,predicted_approved=bool(prediction[0]),predicted_probability=float(probability[0]))
+        probability = model.predict_proba(df)[:, 1]         # предіктимо стосовно даних користувача
+        serializer.save(user=self.request.user,predicted_approved=bool(prediction[0]),predicted_probability=float(probability[0])) #зберігаємо результат
 #рендерим нашу страницу предварительно оборачивая её только в залогиненых пользователей
 @login_required
 def apply_loan_application(request):

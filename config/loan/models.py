@@ -33,7 +33,6 @@ class LoanApplication(models.Model):
     coapplicant_income = models.PositiveIntegerField(default=0)
     loan_amount = models.DecimalField(max_digits=10,decimal_places=2)
     loan_amount_term = models.PositiveIntegerField(default=0)
-    credit_history = models.DecimalField(max_digits=2, decimal_places=1, null=True, blank=True)
     AREA_CHOICES = [
         ("Urban", "Urban"),
         ("Rural", "Rural"),
