@@ -1,7 +1,7 @@
 {% extends "loan/base.html" %}
 {% block title %}Registration{% endblock %}
 {% block content %}
-<h2>Регистрация</h2>
+<h2>Реєстрація</h2>
 <form method="post" action="{% url 'register' %}">
   {% csrf_token %}
   <label>Email
@@ -16,7 +16,7 @@
   <label>Повтор пароля
     <input type="password" name="password2" required>
   </label>
-  <button type="submit">Создать аккаунт</button>
+  <button type="submit">Створити акаунт</button>
 </form>
-<p>Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+<p>Уже є акаунт? <a href="{% url 'login' %}">Увійти</a></p>
 {% endblock %}

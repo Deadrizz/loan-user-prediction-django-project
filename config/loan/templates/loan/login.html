@@ -1,10 +1,10 @@
 {% extends "loan/base.html" %}
 {% block title %}Entry{% endblock %}
 {% block content %}
-<h2>Вход</h2>
+<h2>Вхід</h2>
 <form method="post" action="{% url 'login' %}">
   {% csrf_token %}
-  <label>Имя пользователя
+  <label>Ім'я користувача
     <input type="text" name="username" required>
   </label>
   <label>Пароль
@@ -12,5 +12,5 @@
   </label>
   <button type="submit">Войти</button>
 </form>
-<p>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь</a></p>
+<p>Немає облікового запису? <a href="{% url 'register' %}">Зареєструйтесь</a></p>
 {% endblock %}
