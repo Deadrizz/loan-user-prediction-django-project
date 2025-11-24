@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: loan_appication/config
+        working-directory: config
 
     services:
       postgres:
