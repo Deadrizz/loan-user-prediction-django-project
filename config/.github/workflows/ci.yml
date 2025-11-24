@@ -10,7 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    # Все команды будем выполнять в папке с manage.py
     defaults:
       run:
         working-directory: loan_appication/config
